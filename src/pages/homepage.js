@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import axios from 'axios';
 import React from 'react';
@@ -111,6 +112,7 @@ export function HomePage() {
 
   return (
     <div>
+      <Link to="/issues">Issue Page</Link>
       <Feed likedIds={likedIds} toggleLike={toggleLike} posts={postData} />
       <button
         className="load-more-btn"
