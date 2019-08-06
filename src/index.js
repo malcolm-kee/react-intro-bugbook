@@ -66,6 +66,7 @@ function Feed(props) {
           liked={likedIds.includes(post.id)}
           onLikeClick={() => props.toggleLike(post.id)}
           data={post}
+          key={post.id}
         />
       ))}
     </div>
