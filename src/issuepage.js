@@ -139,7 +139,7 @@ function IssueForm(props) {
         </SelectInput>
         <div class="card-actions">
           <button type="submit" className="btn">
-            Create
+            {props.selectedId ? 'Save' : 'Create'}
           </button>
           <button onClick={clear} type="reset" className="btn btn-white">
             Cancel
