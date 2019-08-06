@@ -17,6 +17,34 @@ function Spinner() {
   return <div className="spinner" />;
 }
 
+function IssueForm() {
+  const [name, setName] = React.useState('');
+  const [status, setStatus] = React.useState('');
+
+  return (
+    <div>
+      <input value={name} onChange={ev => setName(ev.target.value)} />
+      <select
+        value={status}
+        onChange={ev => setStatus(ev.target.value)}
+        id="status"
+        name="status"
+        required
+      >
+        <option value="" />
+        <option value="New">New</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Clarification Required" disabled>
+          Clarification Required
+        </option>
+        <option value="Rejected" disabled>
+          Rejected
+        </option>
+      </select>
+    </div>
+  );
+}
+
 export const IssuePage = () => {
   const [issues, setIssues] = React.useState([]);
   const [status, setStatus] = React.useState('loading');
@@ -51,6 +79,7 @@ export const IssuePage = () => {
           key={issue.id}
         />
       ))}
+      <IssueForm />
     </div>
   );
 };
