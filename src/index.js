@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import { HomePage } from './pages/homepage';
 import { IssuePage } from './pages/issuepage';
-import { HomePage } from './pages/homepage';
 import './style.scss';
 
 class App extends React.Component {
