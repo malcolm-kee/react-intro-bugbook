@@ -59,13 +59,17 @@ function IssueForm(props) {
   }
 
   React.useEffect(() => {
-    axios
-      .get(`https://bugbook-server.herokuapp.com/bugs/${props.selectedId}`)
-      .then(res => {
-        setReported(res.data.reportedBy);
-        setTitle(res.data.title);
-        setStatus(res.data.status);
-      });
+    if (props.selectedId) {
+      axios
+        .get(`https://bugbook-server.herokuapp.com/bugs/${props.selectedId}`)
+        .then(res => {
+          setReported(res.data.reportedBy);
+          setTitle(res.data.title);
+          setStatus(res.data.status);
+        });
+    } else {
+      clear();
+    }
   }, [props.selectedId]);
 
   function submitForm() {
