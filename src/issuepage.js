@@ -106,38 +106,40 @@ function IssueForm(props) {
           submitForm();
         }}
       >
-        <span>{props.selectedId ? 'Edit' : 'Create'}</span>
-        <TextInput
-          label="Your Name"
-          value={reportedBy}
-          onChange={ev => setReported(ev.target.value)}
-          required
-        />
-        <TextInput
-          label="Issue Title"
-          value={title}
-          onChange={ev => setTitle(ev.target.value)}
-          required
-        />
-        <SelectInput
-          label="Status"
-          value={status}
-          onChange={ev => setStatus(ev.target.value)}
-          id="status"
-          name="status"
-          required
-        >
-          <option value="" />
-          <option value="New">New</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Clarification Required" disabled>
-            Clarification Required
-          </option>
-          <option value="Rejected" disabled>
-            Rejected
-          </option>
-        </SelectInput>
-        <div class="card-actions">
+        <div className="card-title">{props.selectedId ? 'Edit' : 'Create'}</div>
+        <div className="card-content">
+          <TextInput
+            label="Your Name"
+            value={reportedBy}
+            onChange={ev => setReported(ev.target.value)}
+            required
+          />
+          <TextInput
+            label="Issue Title"
+            value={title}
+            onChange={ev => setTitle(ev.target.value)}
+            required
+          />
+          <SelectInput
+            label="Status"
+            value={status}
+            onChange={ev => setStatus(ev.target.value)}
+            id="status"
+            name="status"
+            required
+          >
+            <option value="" />
+            <option value="New">New</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Clarification Required" disabled>
+              Clarification Required
+            </option>
+            <option value="Rejected" disabled>
+              Rejected
+            </option>
+          </SelectInput>
+        </div>
+        <div className="card-actions">
           <button type="submit" className="btn">
             {props.selectedId ? 'Save' : 'Create'}
           </button>
