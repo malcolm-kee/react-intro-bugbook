@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HomePage } from './homepage';
-// import { IssuePage } from './issuepage';
+// import { HomePage } from './pages/homepage';
+import { IssuePage } from './pages/issuepage';
+import { HomePage } from './pages/homepage';
+import './style.scss';
 
 class App extends React.Component {
   state = {
@@ -15,7 +17,7 @@ class App extends React.Component {
   }
 
   render() {
-    return this.state.hasError ? <p>Something goes wrong</p> : <HomePage />;
+    return this.state.hasError ? <p>Something goes wrong</p> : <IssuePage />;
   }
 }
 

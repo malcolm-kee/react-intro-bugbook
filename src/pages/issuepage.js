@@ -1,27 +1,25 @@
-import axios from 'axios';
 import React from 'react';
+import { Button } from '../components/button';
+import { Input } from '../components/input';
+import { Card, CardActions, CardContents, CardTitle } from '../components/card';
+import { Spinner } from '../components/spinner';
+import { DataContainer } from '../components/data-container';
+import * as services from '../services/bug-services';
 
 function BugItem(props) {
   return (
-    <article onClick={props.onClick} className="card bug-item">
-      <div className="card-title">{props.status}</div>
-      <div className="card-content">
-        <p>{props.title}</p>
-        <i>Reported by {props.reportedBy}</i>
-      </div>
-    </article>
+    <Card onClick={props.onClick} title={props.status} className="bug-item">
+      <p>{props.title}</p>
+      <i>Reported by {props.reportedBy}</i>
+    </Card>
   );
-}
-
-function Spinner() {
-  return <div className="spinner" />;
 }
 
 function TextInput(props) {
   return (
     <div className="form-control">
       <label htmlFor={props.id}>{props.label}</label>
-      <input
+      <Input
         id={props.id}
         value={props.value}
         onChange={props.onChange}
@@ -60,13 +58,11 @@ function IssueForm(props) {
 
   React.useEffect(() => {
     if (props.selectedId) {
-      axios
-        .get(`https://bugbook-server.herokuapp.com/bugs/${props.selectedId}`)
-        .then(res => {
-          setReported(res.data.reportedBy);
-          setTitle(res.data.title);
-          setStatus(res.data.status);
-        });
+      services.getBug(props.selectedId).then(res => {
+        setReported(res.data.reportedBy);
+        setTitle(res.data.title);
+        setStatus(res.data.status);
+      });
     } else {
       clear();
     }
@@ -74,19 +70,20 @@ function IssueForm(props) {
 
   function submitForm() {
     if (props.selectedId) {
-      axios
-        .put(`https://bugbook-server.herokuapp.com/bugs/${props.selectedId}`, {
+      services
+        .updateBug({
           reportedBy,
           title,
           status,
+          id: props.selectedId,
         })
         .then(res => {
           clear();
           props.onSubmitSuccess();
         });
     } else {
-      axios
-        .post(`https://bugbook-server.herokuapp.com/bugs`, {
+      services
+        .createBug({
           reportedBy,
           title,
           status,
@@ -106,8 +103,8 @@ function IssueForm(props) {
           submitForm();
         }}
       >
-        <div className="card-title">{props.selectedId ? 'Edit' : 'Create'}</div>
-        <div className="card-content">
+        <CardTitle>{props.selectedId ? 'Edit' : 'Create'}</CardTitle>
+        <CardContents>
           <TextInput
             label="Your Name"
             value={reportedBy}
@@ -138,15 +135,13 @@ function IssueForm(props) {
               Rejected
             </option>
           </SelectInput>
-        </div>
-        <div className="card-actions">
-          <button type="submit" className="btn">
-            {props.selectedId ? 'Save' : 'Create'}
-          </button>
-          <button onClick={clear} type="reset" className="btn btn-white">
+        </CardContents>
+        <CardActions>
+          <Button type="submit">{props.selectedId ? 'Save' : 'Create'}</Button>
+          <Button color="white" onClick={clear} type="reset">
             Cancel
-          </button>
-        </div>
+          </Button>
+        </CardActions>
       </form>
     </div>
   );
@@ -158,8 +153,8 @@ export const IssuePage = () => {
   const [issueId, setIssueId] = React.useState(null);
 
   function loadIssues() {
-    axios
-      .get(`https://bugbook-server.herokuapp.com/bugs`)
+    services
+      .getBugs()
       .then(res => {
         setIssues(res.data);
         setStatus('idle');
@@ -167,18 +162,10 @@ export const IssuePage = () => {
       .catch(err => setStatus('error'));
   }
 
-  React.useEffect(() => {
-    loadIssues();
-  }, []);
+  React.useEffect(loadIssues, []);
 
   return (
-    <div>
-      {status === 'loading' && <Spinner />}
-      {status === 'error' && (
-        <span>
-          Sorry, something goes wrong<button onClick={loadIssues}>Retry</button>
-        </span>
-      )}
+    <DataContainer status={status}>
       {issues.map(issue => (
         <BugItem
           onClick={() => setIssueId(issue.id)}
@@ -195,6 +182,6 @@ export const IssuePage = () => {
           setIssueId(null);
         }}
       />
-    </div>
+    </DataContainer>
   );
 };

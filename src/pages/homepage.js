@@ -1,22 +1,29 @@
+import styled from 'styled-components';
+import cx from 'classnames';
 import axios from 'axios';
 import React from 'react';
+import { button, liked } from './homepage.module.scss';
 
 export function LikeButton(props) {
   return (
     <button
       onClick={props.onClick}
       type="button"
-      className={props.isLiked ? 'button button-liked' : 'button'}
+      className={props.isLiked ? cx(button, liked) : button}
     >
       Like
     </button>
   );
 }
 
+const CardSmallTitle = styled.div`
+  font-size: 15px;
+`;
+
 function LikeAllButton(props) {
   return (
     <div className="card ads-card">
-      <div className="card-small-title">Exclusive Features for You!</div>
+      <CardSmallTitle>Exclusive Features for You!</CardSmallTitle>
       <button
         onClick={props.onClick}
         id="like-all-btn"
@@ -56,14 +63,18 @@ function Post(props) {
   );
 }
 
-function Feed(props) {
-  const likedIds = props.likedIds;
+/**
+ *
+ * @param {Object} props
+ * @param {string} props.likedIds likeId is the id that should be "liked"
+ */
+function Feed({ likedIds, posts, toggleLike }) {
   return (
     <div className="feed">
-      {props.posts.map(post => (
+      {posts.map(post => (
         <Post
           liked={likedIds.includes(post.id)}
-          onLikeClick={() => props.toggleLike(post.id)}
+          onLikeClick={() => toggleLike(post.id)}
           data={post}
           key={post.id}
         />
@@ -98,8 +109,6 @@ export function HomePage() {
     }
   }
 
-  const data = {};
-
   return (
     <div>
       <Feed likedIds={likedIds} toggleLike={toggleLike} posts={postData} />
@@ -114,7 +123,6 @@ export function HomePage() {
       <LikeAllButton
         onClick={() => setLikeIds(postData.map(post => post.id))}
       />
-      <div>{data}</div>
     </div>
   );
 }
