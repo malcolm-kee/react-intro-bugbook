@@ -79,8 +79,8 @@ function usePostData(page, limit) {
       .get(
         `https://bugbook-server.herokuapp.com/posts?_page=${page}&_limit=${limit}`
       )
-      .then(res => setPostData(postData.concat(res.data)));
-  }, [page]);
+      .then(res => setPostData(posts => posts.concat(res.data)));
+  }, [page, limit]);
 
   return postData;
 }
