@@ -72,16 +72,23 @@ function Feed(props) {
   );
 }
 
-export function HomePage() {
-  const [likedIds, setLikeIds] = React.useState([]);
+function usePostData(page, limit) {
   const [postData, setPostData] = React.useState([]);
-  const [page, setPage] = React.useState(1);
-
   React.useEffect(() => {
     axios
-      .get(`https://bugbook-server.herokuapp.com/posts?_page=${page}&_limit=3`)
+      .get(
+        `https://bugbook-server.herokuapp.com/posts?_page=${page}&_limit=${limit}`
+      )
       .then(res => setPostData(postData.concat(res.data)));
   }, [page]);
+
+  return postData;
+}
+
+export function HomePage() {
+  const [likedIds, setLikeIds] = React.useState([]);
+  const [page, setPage] = React.useState(1);
+  const postData = usePostData(page, 5);
 
   function toggleLike(id) {
     if (likedIds.includes(id)) {
@@ -90,6 +97,8 @@ export function HomePage() {
       setLikeIds(likedIds.concat(id));
     }
   }
+
+  const data = {};
 
   return (
     <div>
@@ -105,6 +114,7 @@ export function HomePage() {
       <LikeAllButton
         onClick={() => setLikeIds(postData.map(post => post.id))}
       />
+      <div>{data}</div>
     </div>
   );
 }
