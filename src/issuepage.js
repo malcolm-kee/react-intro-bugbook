@@ -3,7 +3,7 @@ import React from 'react';
 
 function BugItem(props) {
   return (
-    <article className="card bug-item">
+    <article onClick={props.onClick} className="card bug-item">
       <div className="card-title">{props.status}</div>
       <div className="card-content">
         <p>{props.title}</p>
@@ -17,30 +17,131 @@ function Spinner() {
   return <div className="spinner" />;
 }
 
-function IssueForm() {
-  const [name, setName] = React.useState('');
+function TextInput(props) {
+  return (
+    <div className="form-control">
+      <label htmlFor={props.id}>{props.label}</label>
+      <input
+        id={props.id}
+        value={props.value}
+        onChange={props.onChange}
+        required={props.required}
+      />
+    </div>
+  );
+}
+
+function SelectInput(props) {
+  return (
+    <div className="form-control">
+      <label htmlFor={props.id}>{props.label}</label>
+      <select
+        id={props.id}
+        value={props.value}
+        onChange={props.onChange}
+        required={props.required}
+      >
+        {props.children}
+      </select>
+    </div>
+  );
+}
+
+function IssueForm(props) {
+  const [reportedBy, setReported] = React.useState('');
+  const [title, setTitle] = React.useState('');
   const [status, setStatus] = React.useState('');
 
+  function clear() {
+    setReported('');
+    setTitle('');
+    setStatus('');
+  }
+
+  React.useEffect(() => {
+    axios
+      .get(`https://bugbook-server.herokuapp.com/bugs/${props.selectedId}`)
+      .then(res => {
+        setReported(res.data.reportedBy);
+        setTitle(res.data.title);
+        setStatus(res.data.status);
+      });
+  }, [props.selectedId]);
+
+  function submitForm() {
+    if (props.selectedId) {
+      axios
+        .put(`https://bugbook-server.herokuapp.com/bugs/${props.selectedId}`, {
+          reportedBy,
+          title,
+          status,
+        })
+        .then(res => {
+          clear();
+          props.onSubmitSuccess();
+        });
+    } else {
+      axios
+        .post(`https://bugbook-server.herokuapp.com/bugs`, {
+          reportedBy,
+          title,
+          status,
+        })
+        .then(res => {
+          clear();
+          props.onSubmitSuccess();
+        });
+    }
+  }
+
   return (
-    <div>
-      <input value={name} onChange={ev => setName(ev.target.value)} />
-      <select
-        value={status}
-        onChange={ev => setStatus(ev.target.value)}
-        id="status"
-        name="status"
-        required
+    <div className="card">
+      <form
+        onSubmit={ev => {
+          ev.preventDefault();
+          submitForm();
+        }}
       >
-        <option value="" />
-        <option value="New">New</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Clarification Required" disabled>
-          Clarification Required
-        </option>
-        <option value="Rejected" disabled>
-          Rejected
-        </option>
-      </select>
+        <span>{props.selectedId ? 'Edit' : 'Create'}</span>
+        <TextInput
+          label="Your Name"
+          value={reportedBy}
+          onChange={ev => setReported(ev.target.value)}
+          required
+        />
+        <TextInput
+          label="Issue Title"
+          value={title}
+          onChange={ev => setTitle(ev.target.value)}
+          required
+        />
+        <SelectInput
+          label="Status"
+          value={status}
+          onChange={ev => setStatus(ev.target.value)}
+          id="status"
+          name="status"
+          required
+        >
+          <option value="" />
+          <option value="New">New</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Clarification Required" disabled>
+            Clarification Required
+          </option>
+          <option value="Rejected" disabled>
+            Rejected
+          </option>
+        </SelectInput>
+        <div class="card-actions">
+          <button type="submit" className="btn">
+            Create
+          </button>
+          <button onClick={clear} type="reset" className="btn btn-white">
+            Cancel
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -48,6 +149,7 @@ function IssueForm() {
 export const IssuePage = () => {
   const [issues, setIssues] = React.useState([]);
   const [status, setStatus] = React.useState('loading');
+  const [issueId, setIssueId] = React.useState(null);
 
   function loadIssues() {
     axios
@@ -73,13 +175,20 @@ export const IssuePage = () => {
       )}
       {issues.map(issue => (
         <BugItem
+          onClick={() => setIssueId(issue.id)}
           title={issue.title}
           status={issue.status}
           reportedBy={issue.reportedBy}
           key={issue.id}
         />
       ))}
-      <IssueForm />
+      <IssueForm
+        selectedId={issueId}
+        onSubmitSuccess={() => {
+          loadIssues();
+          setIssueId(null);
+        }}
+      />
     </div>
   );
 };
